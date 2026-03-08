@@ -1,0 +1,890 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Physio Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --green: #00ffaa;
+      --cyan: #00e5ff;
+      --red: #ff3c64;
+      --gold: #ffd700;
+      --border: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.8);
+      --muted: rgba(255,255,255,0.35);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(0,255,170,.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(255,60,100,.05) 0%, transparent 60%);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,.6);
+    }
+
+    /* HEADER */
+    .hdr {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      padding: 24px 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hdr::before {
+      content: '+';
+      position: absolute;
+      right: -10px; top: -20px;
+      font-size: 150px; font-weight: 900;
+      color: rgba(0,0,0,.07);
+      line-height: 1;
+      font-family: 'Syne', sans-serif;
+      pointer-events: none;
+    }
+    .hdr-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #0a0e1a; letter-spacing: -.5px; }
+    .hdr-sub { font-size: 12px; color: rgba(10,14,26,.65); margin-top: 2px; font-weight: 500; }
+
+    /* STATS */
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
+    .stat { padding: 14px 8px; text-align: center; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--green); }
+    .stat-val.cyan { color: var(--cyan); }
+    .stat-val.gold { color: var(--gold); }
+    .stat-val.pulse { animation: statpulse .5s ease; }
+    @keyframes statpulse { 0%{transform:scale(1)} 50%{transform:scale(1.35);color:#fff} 100%{transform:scale(1)} }
+    .stat-lbl { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+    /* SCREENS */
+    .screen { padding: 22px; display: none; }
+    .screen.active { display: block; }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      color: #0a0e1a; border: none;
+      padding: 15px 20px; border-radius: 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s, transform .15s;
+      text-align: center;
+    }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      display: block; width: 100%;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.1);
+      padding: 14px 20px; border-radius: 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background .2s, transform .15s;
+      text-align: center;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
+
+    .btn-sm {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      color: #0a0e1a; border: none;
+      padding: 11px 16px; border-radius: 11px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+      white-space: nowrap;
+    }
+    .btn-sm:hover { opacity: .9; }
+
+    .btn-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .btn-row { display: flex; gap: 10px; }
+    .btn-row .btn-primary, .btn-row .btn-secondary { flex: 1; }
+    .flex-2 { flex: 2 !important; }
+
+    /* HOME */
+    .home-hero { text-align: center; padding: 12px 0 20px; }
+    .home-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 16px;
+      box-shadow: 0 0 40px rgba(0,255,170,.25);
+    }
+    .home-title { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1.1; }
+    .home-sub { color: rgba(255,255,255,.45); font-size: 14px; margin-top: 6px; }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0; }
+    .badge { background: linear-gradient(135deg, var(--gold), #ffaa00); color: #1a1000; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 100px; }
+
+    /* HOW TO PLAY */
+    .section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--green); margin-bottom: 18px; letter-spacing: -.5px; }
+    .info-block { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .info-block-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    .info-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .info-list li { color: rgba(255,255,255,.7); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .dot.red { background: var(--red); }
+
+    /* SCENARIO */
+    .prog-wrap { margin-bottom: 18px; }
+    .prog-labels { display: flex; justify-content: space-between; margin-bottom: 7px; }
+    .prog-text { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .5px; }
+    .prog-track { height: 3px; background: rgba(255,255,255,.08); border-radius: 100px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); border-radius: 100px; transition: width .5s ease; }
+
+    .incident-card { background: rgba(0,255,170,.05); border: 1px solid rgba(0,255,170,.18); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .incident-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .incident-sport { display: flex; align-items: center; gap: 8px; }
+    .incident-emoji { font-size: 22px; }
+    .incident-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: var(--green); letter-spacing: -.3px; }
+    .speak-btn {
+      width: 32px; height: 32px;
+      background: rgba(0,255,170,.12); border: 1px solid rgba(0,255,170,.25);
+      border-radius: 50%; color: var(--green); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; transition: background .2s;
+    }
+    .speak-btn:hover { background: rgba(0,255,170,.22); }
+    .incident-text { color: rgba(255,255,255,.7); font-size: 13px; line-height: 1.6; }
+
+    .chat-window {
+      background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px; padding: 12px; max-height: 200px; overflow-y: auto;
+      margin-bottom: 16px; display: flex; flex-direction: column; gap: 7px;
+    }
+    .chat-window::-webkit-scrollbar { width: 3px; }
+    .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+    .chat-msg { padding: 9px 12px; border-radius: 9px; font-size: 12px; line-height: 1.5; animation: msgin .25s ease; }
+    @keyframes msgin { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+    .chat-msg.bot { background: rgba(0,229,255,.1); border-left: 2px solid var(--cyan); color: rgba(255,255,255,.8); }
+    .chat-msg.user { background: rgba(255,255,255,.06); border-left: 2px solid rgba(255,255,255,.2); color: rgba(255,255,255,.6); }
+    .chat-msg.feedback { background: rgba(0,255,170,.1); border-left: 2px solid var(--green); color: var(--green); font-weight: 600; font-size: 11px; }
+
+    .sec-label { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; }
+
+    .q-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .q-btn {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 11px; padding: 11px 12px;
+      display: flex; align-items: center; gap: 9px;
+      cursor: pointer; transition: all .2s; text-align: left; width: 100%;
+    }
+    .q-btn:hover:not(.used) { background: rgba(0,255,170,.06); border-color: rgba(0,255,170,.25); }
+    .q-btn.used { opacity: .28; cursor: not-allowed; }
+    .q-icon { font-size: 15px; flex-shrink: 0; }
+    .q-text { flex: 1; font-size: 12px; color: rgba(255,255,255,.78); font-weight: 500; }
+    .q-speak {
+      width: 26px; height: 26px; background: rgba(255,255,255,.05);
+      border: none; border-radius: 50%; font-size: 11px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: background .2s; flex-shrink: 0;
+    }
+    .q-speak:hover { background: rgba(255,255,255,.14); }
+
+    .custom-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .custom-input {
+      flex: 1; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 11px; padding: 11px 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: #fff;
+      outline: none; transition: border-color .2s;
+    }
+    .custom-input::placeholder { color: rgba(255,255,255,.22); }
+    .custom-input:focus { border-color: rgba(0,255,170,.35); }
+
+    .diagnose-cta { background: linear-gradient(135deg, rgba(0,255,170,.1), rgba(0,229,255,.1)); border: 1px solid rgba(0,255,170,.25); border-radius: 14px; padding: 18px; text-align: center; animation: msgin .3s ease; }
+    .diagnose-cta p { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 10px; }
+
+    /* DIAGNOSIS */
+    .screen-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.4px; margin-bottom: 4px; }
+    .screen-sub { font-size: 13px; color: rgba(255,255,255,.38); margin-bottom: 18px; }
+
+    .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 18px; }
+    .diag-btn {
+      background: rgba(255,255,255,.04); border: 1.5px solid rgba(255,255,255,.09);
+      border-radius: 11px; padding: 13px 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,.7); cursor: pointer; text-align: center;
+      transition: all .2s; line-height: 1.3;
+    }
+    .diag-btn:hover { background: rgba(0,255,170,.06); border-color: rgba(0,255,170,.28); color: #fff; }
+    .diag-btn.selected { background: rgba(0,255,170,.1); border-color: var(--green); color: var(--green); }
+
+    /* RESULT */
+    .result-card { border-radius: 16px; padding: 28px 20px; text-align: center; margin-bottom: 18px; }
+    .result-card.ok { background: rgba(0,255,170,.07); border: 1px solid rgba(0,255,170,.22); }
+    .result-card.ng { background: rgba(255,60,100,.07); border: 1px solid rgba(255,60,100,.22); }
+    .result-icon { font-size: 48px; margin-bottom: 14px; }
+    .result-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+    .result-title.ok { color: var(--green); }
+    .result-title.ng { color: var(--red); }
+    .result-diag { font-size: 14px; color: rgba(255,255,255,.65); }
+    .result-diag strong { color: #fff; }
+    .result-hint { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 6px; }
+
+    /* BODY PARTS */
+    .bp-grid { display: flex; gap: 10px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+    .bp-btn {
+      background: rgba(255,255,255,.04); border: 1.5px solid rgba(255,255,255,.09);
+      border-radius: 14px; padding: 18px 20px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,.65); cursor: pointer; text-align: center;
+      transition: all .2s; min-width: 110px;
+    }
+    .bp-btn:hover { background: rgba(0,255,170,.06); border-color: rgba(0,255,170,.25); }
+    .bp-btn.selected { background: rgba(0,255,170,.1); border-color: var(--green); color: var(--green); }
+    .bp-emoji { font-size: 22px; display: block; margin-bottom: 5px; }
+
+    /* COMPLETE */
+    .all-done { background: linear-gradient(135deg, rgba(255,215,0,.1), rgba(255,170,0,.1)); border: 1px solid rgba(255,215,0,.22); border-radius: 16px; padding: 22px; text-align: center; margin-bottom: 18px; }
+    .all-done-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+    .all-done-pts { font-size: 48px; font-weight: 800; font-family: 'Syne', sans-serif; color: #fff; }
+    .all-done-sub { font-size: 12px; color: rgba(255,255,255,.38); margin-top: 3px; }
+
+    /* SCOREBOARD */
+    .score-big { text-align: center; padding: 20px 0 16px; }
+    .score-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; color: var(--green); line-height: 1; text-shadow: 0 0 50px rgba(0,255,170,.25); }
+    .score-lbl { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    .score-cell { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 16px; text-align: center; }
+    .score-cell-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: #fff; }
+    .score-cell-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .divider { height: 1px; background: rgba(255,255,255,.06); margin: 2px 0 14px; }
+    .no-badge { font-size: 13px; color: rgba(255,255,255,.28); text-align: center; padding: 14px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <div class="hdr">
+      <div class="hdr-title">🏥 Sports Physio Challenge</div>
+      <div class="hdr-sub">Ask. Diagnose. Heal.</div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val" id="stat-points">0</div>
+        <div class="stat-lbl">Points</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val cyan" id="stat-done">0/5</div>
+        <div class="stat-lbl">Done</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val gold" id="stat-badges">0</div>
+        <div class="stat-lbl">Badges</div>
+      </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div class="screen active" id="screen-home">
+      <div class="home-hero">
+        <div class="home-icon">👨‍⚕️</div>
+        <div class="home-title">Welcome,<br>Physio!</div>
+        <div class="home-sub">Diagnose injuries. Earn points. Level up.</div>
+      </div>
+      <div class="badge-row" id="home-badges"></div>
+      <div class="btn-stack">
+        <button class="btn-primary" onclick="startScenario(0)">🎯 Start Challenge</button>
+        <button class="btn-secondary" onclick="showScreen('howto')">📖 How to Play</button>
+        <button class="btn-secondary" onclick="showScreen('scoreboard'); renderScoreboard()">🏆 Scoreboard</button>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY SCREEN -->
+    <div class="screen" id="screen-howto">
+      <div class="section-title">How to Play</div>
+      <div class="info-block">
+        <div class="info-block-title">Your Mission</div>
+        <ul class="info-list">
+          <li><span class="dot"></span>Ask 3–5 questions about the injury</li>
+          <li><span class="dot"></span>Tap questions or type your own</li>
+          <li><span class="dot"></span>Guess the correct injury</li>
+          <li><span class="dot"></span>Find which body parts are hurt</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">Points</div>
+        <ul class="info-list">
+          <li><span class="dot"></span>+2 pts for good questions</li>
+          <li><span class="dot"></span>+5 pts for correct injury</li>
+          <li><span class="dot"></span>+3 pts for correct body parts</li>
+          <li><span class="dot red"></span>−1 pt for wrong guess</li>
+        </ul>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="showScreen('home')">← Back</button>
+        <button class="btn-primary flex-2" onclick="startScenario(0)">Start Playing 🎯</button>
+      </div>
+    </div>
+
+    <!-- SCENARIO SCREEN -->
+    <div class="screen" id="screen-scenario">
+      <div class="prog-wrap">
+        <div class="prog-labels">
+          <span class="prog-text" id="prog-label">SCENARIO 1 OF 5</span>
+          <span class="prog-text" id="prog-asked">0 asked</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:20%"></div></div>
+      </div>
+      <div class="incident-card">
+        <div class="incident-top">
+          <div class="incident-sport">
+            <span class="incident-emoji" id="inc-emoji"></span>
+            <span class="incident-name" id="inc-name"></span>
+          </div>
+          <button class="speak-btn" onclick="speakIncident()">🔊</button>
+        </div>
+        <div class="incident-text" id="inc-text"></div>
+      </div>
+      <div class="chat-window" id="chat-window"></div>
+      <div class="sec-label">Ask a Question</div>
+      <div class="q-list" id="q-list"></div>
+      <div class="custom-row">
+        <input class="custom-input" id="custom-q" type="text" placeholder="Type your own question..." />
+        <button class="btn-sm" onclick="askCustom()">Ask</button>
+      </div>
+      <div id="diagnose-cta" style="display:none">
+        <div class="diagnose-cta">
+          <p>You have enough info to make a diagnosis!</p>
+          <button class="btn-primary" onclick="showScreen('diagnosis'); renderDiagnosis()">🩺 Make Diagnosis</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIAGNOSIS SCREEN -->
+    <div class="screen" id="screen-diagnosis">
+      <div class="screen-title">🩺 Make Your Diagnosis</div>
+      <div class="screen-sub">What injury do you think it is?</div>
+      <div class="diag-grid" id="diag-grid"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="showScreen('scenario')">← More Qs</button>
+        <button class="btn-primary flex-2" id="submit-diag-btn" onclick="submitDiagnosis()" disabled>Submit Diagnosis</button>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div class="screen" id="screen-result">
+      <div id="result-card"></div>
+      <button class="btn-primary" onclick="showScreen('bodyparts'); renderBodyParts()">Next: Body Parts 🦴</button>
+    </div>
+
+    <!-- BODY PARTS SCREEN -->
+    <div class="screen" id="screen-bodyparts">
+      <div class="screen-title">🦴 Body Parts Involved?</div>
+      <div class="screen-sub">Select all that apply</div>
+      <div class="bp-grid" id="bp-grid"></div>
+      <button class="btn-primary" onclick="submitBodyParts()">Submit Answer</button>
+    </div>
+
+    <!-- COMPLETE SCREEN -->
+    <div class="screen" id="screen-complete">
+      <div id="bp-result-card"></div>
+      <div id="all-done-banner" style="display:none">
+        <div class="all-done">
+          <div class="all-done-title">🎉 All Scenarios Complete!</div>
+          <div class="all-done-pts" id="final-pts">0</div>
+          <div class="all-done-sub">Total Points</div>
+        </div>
+      </div>
+      <div class="btn-stack" id="complete-btns"></div>
+    </div>
+
+    <!-- SCOREBOARD SCREEN -->
+    <div class="screen" id="screen-scoreboard">
+      <div class="screen-title">🏆 Scoreboard</div>
+      <div class="divider"></div>
+      <div class="score-big">
+        <div class="score-num" id="sb-pts">0</div>
+        <div class="score-lbl">Total Points</div>
+      </div>
+      <div class="score-grid">
+        <div class="score-cell">
+          <div class="score-cell-val cyan" id="sb-done">0</div>
+          <div class="score-cell-lbl">Scenarios Done</div>
+        </div>
+        <div class="score-cell">
+          <div class="score-cell-val gold" id="sb-badges-count">0</div>
+          <div class="score-cell-lbl">Badges Earned</div>
+        </div>
+      </div>
+      <div class="sec-label">Your Badges</div>
+      <div id="sb-badges"></div>
+      <button class="btn-primary" style="margin-top:16px" onclick="showScreen('home')">← Back to Home</button>
+    </div>
+  </div>
+
+  <script>
+    // ─── DATA ───────────────────────────────────────────────────────────────
+    const scenarios = [
+      {
+        sport: "Soccer Tackle", emoji: "⚽",
+        incident: "Player tackled. Shin hit hard. Can't stand.",
+        symptoms: "Sharp lower leg pain. Swelling. Can't put weight on it.",
+        correctDiagnosis: "Broken tibia",
+        diagnosisOptions: ["Broken tibia","Sprained ankle","Calf strain","Bruised shin","Dislocated kneecap","Hamstring strain"],
+        bodyParts: ["Tibia bone (bone)"], correctBodyParts: ["bone"],
+        answers: {
+          "Where does it hurt?": "Lower leg, front part of shin bone area.",
+          "Did you hear a crack or pop?": "Yes, heard a crack sound during tackle.",
+          "Can you put weight on it?": "No, can't stand or put any weight.",
+          "Is there swelling or bruising?": "Yes, swelling quickly. Some bruising.",
+          "Can you move it?": "Hurts too much to move leg.",
+          "What were you doing when it happened?": "Got tackled hard during soccer game.",
+          "Rate the pain: low/medium/high": "High pain, hurts a lot!"
+        }
+      },
+      {
+        sport: "Basketball Landing", emoji: "🏀",
+        incident: "Landed badly after jump. Ankle rolled inward.",
+        symptoms: "Ankle swelling. Pain on outside. Can't run.",
+        correctDiagnosis: "Ankle sprain",
+        diagnosisOptions: ["Ankle sprain","Broken tibia","Achilles strain","Bruised heel","Knee sprain","Shin splints"],
+        bodyParts: ["Ankle joint","Ligaments"], correctBodyParts: ["joint"],
+        answers: {
+          "Where does it hurt?": "Outside of ankle joint area.",
+          "Did you hear a crack or pop?": "Maybe a small pop when it rolled.",
+          "Can you put weight on it?": "A little, but hurts to walk or run.",
+          "Is there swelling or bruising?": "Yes, ankle swelling on outside.",
+          "Can you move it?": "Can move a bit but hurts.",
+          "What were you doing when it happened?": "Landed from jump, ankle rolled in.",
+          "Rate the pain: low/medium/high": "Medium to high pain."
+        }
+      },
+      {
+        sport: "Sprinting Race", emoji: "🏃",
+        incident: "Sudden pain in back of thigh during sprint.",
+        symptoms: "Sharp pull feeling. Walking is sore. Not much swelling.",
+        correctDiagnosis: "Hamstring strain",
+        diagnosisOptions: ["Hamstring strain","Knee dislocation","Groin strain","Calf cramp","Broken femur","Ankle sprain"],
+        bodyParts: ["Hamstring muscle"], correctBodyParts: ["muscle"],
+        answers: {
+          "Where does it hurt?": "Back of thigh, upper leg area.",
+          "Did you hear a crack or pop?": "No crack, but felt a sudden pull.",
+          "Can you put weight on it?": "Yes, but walking hurts.",
+          "Is there swelling or bruising?": "Little swelling at first. Maybe later.",
+          "Can you move it?": "Can move leg but stretching hurts.",
+          "What were you doing when it happened?": "Sprinting fast in a race.",
+          "Rate the pain: low/medium/high": "Medium pain, sharp when moving."
+        }
+      },
+      {
+        sport: "Netball Pivot", emoji: "🏐",
+        incident: "Quick turn and pivot. Knee twisted.",
+        symptoms: "Knee pain. Feels wobbly. Swelling later. Maybe heard pop.",
+        correctDiagnosis: "Knee ligament sprain",
+        diagnosisOptions: ["Knee ligament sprain","Bruised knee","Hamstring strain","Broken tibia","Ankle sprain","Dislocated shoulder"],
+        bodyParts: ["Knee joint","Ligament"], correctBodyParts: ["joint"],
+        answers: {
+          "Where does it hurt?": "Inside knee joint area.",
+          "Did you hear a crack or pop?": "Yes, maybe heard a pop sound.",
+          "Can you put weight on it?": "Can stand but knee feels unstable.",
+          "Is there swelling or bruising?": "Swelling came later, not right away.",
+          "Can you move it?": "Can move but feels loose, unstable.",
+          "What were you doing when it happened?": "Pivoted fast, knee twisted.",
+          "Rate the pain: low/medium/high": "Medium to high pain."
+        }
+      },
+      {
+        sport: "Cricket Throw", emoji: "🏏",
+        incident: "Overhead throw. Shoulder pain.",
+        symptoms: "Pain lifting arm. Limited movement. No leg pain.",
+        correctDiagnosis: "Shoulder muscle strain",
+        diagnosisOptions: ["Shoulder muscle strain","Broken collarbone","Wrist sprain","Concussion","Knee sprain","Elbow dislocation"],
+        bodyParts: ["Shoulder muscles","Shoulder joint"], correctBodyParts: ["muscle","joint"],
+        answers: {
+          "Where does it hurt?": "Top and front of shoulder area.",
+          "Did you hear a crack or pop?": "No crack, just pain during throw.",
+          "Can you put weight on it?": "Not about weight, it's the shoulder.",
+          "Is there swelling or bruising?": "Little swelling, maybe some tenderness.",
+          "Can you move it?": "Can move but hurts to lift arm up.",
+          "What were you doing when it happened?": "Throwing ball overhead hard.",
+          "Rate the pain: low/medium/high": "Medium pain when lifting arm."
+        }
+      }
+    ];
+
+    const questionBank = [
+      { q: "Where does it hurt?", icon: "📍" },
+      { q: "Did you hear a crack or pop?", icon: "🔊" },
+      { q: "Can you put weight on it?", icon: "🦵" },
+      { q: "Is there swelling or bruising?", icon: "🔵" },
+      { q: "Can you move it?", icon: "🔄" },
+      { q: "What were you doing when it happened?", icon: "⏱️" },
+      { q: "Rate the pain: low/medium/high", icon: "📊" }
+    ];
+
+    const bodyPartOptions = [
+      { label: "Bone", value: "bone", emoji: "🦴" },
+      { label: "Muscle", value: "muscle", emoji: "💪" },
+      { label: "Joint / Ligament", value: "joint", emoji: "🔗" }
+    ];
+
+    // ─── STATE ───────────────────────────────────────────────────────────────
+    let totalPoints = 0;
+    let completedScenarios = 0;
+    let badges = [];
+    let currentScenarioIndex = 0;
+    let questionsAsked = 0;
+    let helpfulQuestions = 0;
+    let usedQuestions = [];
+    let chatHistory = [];
+    let selectedDiagnosis = null;
+    let selectedBodyParts = [];
+
+    // ─── UTILS ───────────────────────────────────────────────────────────────
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function speakIncident() {
+      const s = scenarios[currentScenarioIndex];
+      speak(s.sport + '. ' + s.incident + ' ' + s.symptoms);
+    }
+
+    function addPoints(pts) {
+      totalPoints = Math.max(0, totalPoints + pts);
+      const el = document.getElementById('stat-points');
+      el.textContent = totalPoints;
+      el.classList.remove('pulse');
+      void el.offsetWidth;
+      el.classList.add('pulse');
+      setTimeout(() => el.classList.remove('pulse'), 600);
+    }
+
+    function updateStats() {
+      document.getElementById('stat-points').textContent = totalPoints;
+      document.getElementById('stat-done').textContent = completedScenarios + '/5';
+      document.getElementById('stat-badges').textContent = badges.length;
+    }
+
+    function addBadge(name) {
+      if (!badges.includes(name)) {
+        badges.push(name);
+        document.getElementById('stat-badges').textContent = badges.length;
+      }
+    }
+
+    function renderHomeBadges() {
+      const row = document.getElementById('home-badges');
+      row.innerHTML = badges.map(b => `<span class="badge">🏆 ${b}</span>`).join('');
+    }
+
+    // ─── CHAT ─────────────────────────────────────────────────────────────────
+    function appendChat(type, text) {
+      chatHistory.push({ type, text });
+      const win = document.getElementById('chat-window');
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + type;
+      div.textContent = text;
+      win.appendChild(div);
+      win.scrollTop = win.scrollHeight;
+    }
+
+    // ─── SCENARIO ─────────────────────────────────────────────────────────────
+    function startScenario(index) {
+      currentScenarioIndex = index;
+      questionsAsked = 0;
+      helpfulQuestions = 0;
+      usedQuestions = [];
+      chatHistory = [];
+      selectedDiagnosis = null;
+      selectedBodyParts = [];
+
+      const s = scenarios[index];
+      document.getElementById('prog-label').textContent = 'SCENARIO ' + (index+1) + ' OF 5';
+      document.getElementById('prog-asked').textContent = '0 asked';
+      document.getElementById('prog-fill').style.width = (((index+1)/5)*100) + '%';
+      document.getElementById('inc-emoji').textContent = s.emoji;
+      document.getElementById('inc-name').textContent = s.sport;
+      document.getElementById('inc-text').textContent = s.incident + ' ' + s.symptoms;
+
+      const chatWin = document.getElementById('chat-window');
+      chatWin.innerHTML = '';
+      appendChat('bot', "Hi! I'm Physio Coach 👨‍⚕️ Ask me questions to figure out the injury!");
+
+      renderQuestions();
+      document.getElementById('diagnose-cta').style.display = 'none';
+      document.getElementById('custom-q').value = '';
+
+      const customInput = document.getElementById('custom-q');
+      customInput.onkeydown = (e) => { if (e.key === 'Enter') askCustom(); };
+
+      showScreen('scenario');
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById('q-list');
+      list.innerHTML = '';
+      questionBank.forEach(({ q, icon }) => {
+        const btn = document.createElement('button');
+        btn.className = 'q-btn' + (usedQuestions.includes(q) ? ' used' : '');
+        btn.innerHTML = `
+          <span class="q-icon">${icon}</span>
+          <span class="q-text">${q}</span>
+          <button class="q-speak" onclick="event.stopPropagation();speak('${q.replace(/'/g,"\\'")}')">🔊</button>
+        `;
+        if (!usedQuestions.includes(q)) {
+          btn.onclick = () => askQuestion(q);
+        }
+        list.appendChild(btn);
+      });
+    }
+
+    function askQuestion(q) {
+      if (usedQuestions.includes(q)) return;
+      usedQuestions.push(q);
+      questionsAsked++;
+      helpfulQuestions++;
+
+      const answer = scenarios[currentScenarioIndex].answers[q];
+      appendChat('user', q);
+      appendChat('bot', answer);
+      appendChat('feedback', '✅ Nice physio question! +2 pts');
+      addPoints(2);
+
+      document.getElementById('prog-asked').textContent = questionsAsked + ' asked';
+      renderQuestions();
+      checkDiagnoseCTA();
+    }
+
+    function askCustom() {
+      const input = document.getElementById('custom-q');
+      const q = input.value.trim();
+      if (!q) return;
+
+      questionsAsked++;
+      const s = scenarios[currentScenarioIndex];
+      const lq = q.toLowerCase();
+      let helpful = false, answer = '';
+
+      if (lq.includes('hurt') || lq.includes('pain') || lq.includes('where')) {
+        answer = s.answers["Where does it hurt?"]; helpful = true;
+      } else if (lq.includes('crack') || lq.includes('pop') || lq.includes('hear')) {
+        answer = s.answers["Did you hear a crack or pop?"]; helpful = true;
+      } else if (lq.includes('weight') || lq.includes('stand') || lq.includes('walk')) {
+        answer = s.answers["Can you put weight on it?"]; helpful = true;
+      } else if (lq.includes('swell') || lq.includes('bruis')) {
+        answer = s.answers["Is there swelling or bruising?"]; helpful = true;
+      } else if (lq.includes('move')) {
+        answer = s.answers["Can you move it?"]; helpful = true;
+      } else {
+        answer = "Try asking about pain, movement, swelling, or what happened.";
+      }
+
+      appendChat('user', q);
+      appendChat('bot', answer);
+      if (helpful) {
+        appendChat('feedback', '✅ Good question! +2 pts');
+        addPoints(2);
+        helpfulQuestions++;
+      }
+
+      input.value = '';
+      document.getElementById('prog-asked').textContent = questionsAsked + ' asked';
+      checkDiagnoseCTA();
+    }
+
+    function checkDiagnoseCTA() {
+      if (questionsAsked >= 3) {
+        document.getElementById('diagnose-cta').style.display = 'block';
+      }
+    }
+
+    // ─── DIAGNOSIS ─────────────────────────────────────────────────────────────
+    function renderDiagnosis() {
+      selectedDiagnosis = null;
+      const grid = document.getElementById('diag-grid');
+      grid.innerHTML = '';
+      document.getElementById('submit-diag-btn').disabled = true;
+
+      scenarios[currentScenarioIndex].diagnosisOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'diag-btn';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          document.querySelectorAll('.diag-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedDiagnosis = opt;
+          document.getElementById('submit-diag-btn').disabled = false;
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function submitDiagnosis() {
+      const s = scenarios[currentScenarioIndex];
+      const correct = selectedDiagnosis === s.correctDiagnosis;
+
+      if (correct) {
+        addPoints(5);
+        if (helpfulQuestions >= 4) addBadge('Great Questioner');
+        if (questionsAsked <= 3) addBadge('Fast Diagnoser');
+      } else {
+        addPoints(-1);
+      }
+
+      const card = document.getElementById('result-card');
+      if (correct) {
+        card.innerHTML = `
+          <div class="result-card ok">
+            <div class="result-icon">🎉</div>
+            <div class="result-title ok">Correct! +5 pts</div>
+            <div class="result-diag">It's a <strong>${s.correctDiagnosis}</strong>!</div>
+            <div class="result-hint">Great physio work!</div>
+          </div>`;
+      } else {
+        card.innerHTML = `
+          <div class="result-card ng">
+            <div class="result-icon">😔</div>
+            <div class="result-title ng">Not quite! −1 pt</div>
+            <div class="result-diag">Correct answer: <strong>${s.correctDiagnosis}</strong></div>
+            <div class="result-hint">Keep learning!</div>
+          </div>`;
+      }
+
+      showScreen('result');
+    }
+
+    // ─── BODY PARTS ────────────────────────────────────────────────────────────
+    function renderBodyParts() {
+      selectedBodyParts = [];
+      const grid = document.getElementById('bp-grid');
+      grid.innerHTML = '';
+
+      bodyPartOptions.forEach(({ label, value, emoji }) => {
+        const btn = document.createElement('button');
+        btn.className = 'bp-btn';
+        btn.innerHTML = `<span class="bp-emoji">${emoji}</span>${label}`;
+        btn.onclick = () => {
+          if (selectedBodyParts.includes(value)) {
+            selectedBodyParts = selectedBodyParts.filter(p => p !== value);
+            btn.classList.remove('selected');
+          } else {
+            selectedBodyParts.push(value);
+            btn.classList.add('selected');
+          }
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function submitBodyParts() {
+      const s = scenarios[currentScenarioIndex];
+      const correct =
+        s.correctBodyParts.every(p => selectedBodyParts.includes(p)) &&
+        selectedBodyParts.every(p => s.correctBodyParts.includes(p));
+
+      if (correct) {
+        addPoints(3);
+        addBadge('Body Expert');
+      }
+
+      completedScenarios++;
+      document.getElementById('stat-done').textContent = completedScenarios + '/5';
+
+      const card = document.getElementById('bp-result-card');
+      if (correct) {
+        card.innerHTML = `
+          <div class="result-card ok">
+            <div class="result-icon">✅</div>
+            <div class="result-title ok">Correct! +3 pts</div>
+            <div class="result-diag">Right body parts identified!</div>
+          </div>`;
+      } else {
+        card.innerHTML = `
+          <div class="result-card ng">
+            <div class="result-icon">❌</div>
+            <div class="result-title ng">Not quite!</div>
+            <div class="result-diag">Correct: <strong>${s.bodyParts.join(', ')}</strong></div>
+          </div>`;
+      }
+
+      const doneBanner = document.getElementById('all-done-banner');
+      if (currentScenarioIndex >= 4) {
+        doneBanner.style.display = 'block';
+        document.getElementById('final-pts').textContent = totalPoints;
+      } else {
+        doneBanner.style.display = 'none';
+      }
+
+      const btns = document.getElementById('complete-btns');
+      btns.innerHTML = '';
+      if (currentScenarioIndex < 4) {
+        const next = document.createElement('button');
+        next.className = 'btn-primary';
+        next.textContent = 'Next Scenario →';
+        next.onclick = () => startScenario(currentScenarioIndex + 1);
+        btns.appendChild(next);
+
+        const replay = document.createElement('button');
+        replay.className = 'btn-secondary';
+        replay.textContent = 'Replay This Scenario';
+        replay.onclick = () => startScenario(currentScenarioIndex);
+        btns.appendChild(replay);
+      } else {
+        const again = document.createElement('button');
+        again.className = 'btn-primary';
+        again.textContent = 'Play Again 🔄';
+        again.onclick = () => {
+          totalPoints = 0; completedScenarios = 0; badges = [];
+          updateStats();
+          startScenario(0);
+        };
+        btns.appendChild(again);
+      }
+
+      const home = document.createElement('button');
+      home.className = 'btn-secondary';
+      home.textContent = 'Back to Home';
+      home.onclick = () => { renderHomeBadges(); showScreen('home'); };
+      btns.appendChild(home);
+
+      showScreen('complete');
+    }
+
+    // ─── SCOREBOARD ────────────────────────────────────────────────────────────
+    function renderScoreboard() {
+      document.getElementById('sb-pts').textContent = totalPoints;
+      document.getElementById('sb-done').textContent = completedScenarios;
+      document.getElementById('sb-badges-count').textContent = badges.length;
+      const sbBadges = document.getElementById('sb-badges');
+      if (badges.length > 0) {
+        sbBadges.innerHTML = '<div class="badge-row">' + badges.map(b => `<span class="badge">🏆 ${b}</span>`).join('') + '</div>';
+      } else {
+        sbBadges.innerHTML = '<div class="no-badge">No badges yet — keep playing!</div>';
+      }
+    }
+  </script>
+</body>
+</html>
