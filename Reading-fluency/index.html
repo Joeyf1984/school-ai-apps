@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Reading Fluency Recorder</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+button{
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#7c3aed;
+color:white;
+margin-top:20px;
+}
+
+button:hover{
+background:#5b21b6;
+}
+
+.timer{
+font-size:60px;
+margin:20px 0;
+}
+
+.passage{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-size:18px;
+line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+function FluencyApp(){
+
+const passage = "Skillet is a rock band known for a song that can bring energy to any movie. In Sonic the Hedgehog, their music helps the king of speed swing into action. The song is long and exciting, making you want to sing along.";
+
+const [time,setTime]=React.useState(0)
+const [running,setRunning]=React.useState(false)
+
+React.useEffect(()=>{
+let interval
+
+if(running){
+interval=setInterval(()=>{
+setTime(t=>t+1)
+},1000)
+}
+
+return ()=>clearInterval(interval)
+
+},[running])
+
+function start(){
+setTime(0)
+setRunning(true)
+}
+
+function stop(){
+setRunning(false)
+}
+
+return(
+
+<div className="container">
+
+<h1>📖 Reading Fluency Recorder</h1>
+
+<div className="passage">
+{passage}
+</div>
+
+<div className="timer">
+{time}s
+</div>
+
+{!running && <button onClick={start}>Start Reading</button>}
+
+{running && <button onClick={stop}>Stop</button>}
+
+</div>
+
+)
+
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<FluencyApp/>)
+
+</script>
+
+</body>
+</html>
